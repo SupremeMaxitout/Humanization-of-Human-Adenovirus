@@ -1,0 +1,8 @@
+# Replace this file with config/templates/hadv_c5_hexon_hvr7.txt containing
+# your real HAdV-C5 hexon sequence, as ONE line, with exactly one {} where
+# HVR7 is removed. No FASTA header, no spaces.
+#
+# MATPSMMPQWSYMHISGQDASEYLSPGLVQFAR...{}...AEVKTHGKHYSYNSHW
+#
+# Then verify:
+#   python3 tool1_modelling/00_check_template.py config/hadv_c5_hvr7.yaml

@@ -1,0 +1,82 @@
+# ============================================================================
+# Humanisation run configuration
+#
+# ONE file drives every stage. Change this, not the scripts.
+# Copy it per target: config/hadv_c5_hvr1.yaml, config/hadv_c2_hvr7.yaml, ...
+# ============================================================================
+
+project:
+  name: hadv_c5_hvr7
+  description: "HAdV-C5 hexon, HVR7 humanised against the human proteome"
+
+# --- The viral target being humanised -------------------------------------
+target:
+  virus: HAdV-C5
+  protein: hexon
+  uniprot: P04133
+  protomer_length: 926      # residues per protomer in the FULL construct
+  n_chains: 3               # homotrimer
+
+  # Scaffold sequence with ONE {} placeholder where the graft goes.
+  template: config/templates/hadv_c5_hexon_hvr7.txt
+
+# --- The region being humanised -------------------------------------------
+region:
+  name: HVR7
+  query: GGVINTETLTKVKPKTGQENGWEKDATEFSDKNEIRVGNNF
+  range: [418, 458]         # residues the region occupies in the protomer
+
+# --- ALL region boundaries -------------------------------------------------
+# SINGLE SOURCE OF TRUTH. These were previously duplicated between the SASA
+# script and the MD analysis script, and the two disagreed. Define once, here.
+regions:
+  HVR1: [136, 169]
+  HVR2: [188, 194]
+  HVR3: [212, 218]
+  HVR4: [248, 261]
+  HVR5: [268, 283]
+  HVR6: [305, 314]
+  HVR7: [418, 458]
+
+# --- Stage 1: proteome + homology search ----------------------------------
+homology:
+  proteome_fasta: data/Homo_sapiens.GRCh38.pep.all.fa
+  proteome_json:  data/ensembl_proteins.json
+
+  window_size: 15                 # length of the candidate graft
+  substitution_matrix: BLOSUM62   # BLOSUM45 / BLOSUM62 / BLOSUM80 / PAM250
+  alignment_mode: local           # local | global   (see docs: why local)
+  open_gap_score: -10
+  extend_gap_score: -0.5
+
+  score_threshold: 40
+  normalise_score: true           # also report score / window_size
+
+  ph: 7.4
+  charge_deviation: 0.005         # |net charge difference| tolerated
+  match_polarity: true
+  dedupe_on: description          # description | protein_ID | candidate_sequence
+
+# --- Stage 2: structure prediction ----------------------------------------
+prediction:
+  engine: alphafold3              # alphafold3 | colabfold
+  copies: 3
+  colabfold:
+    num_recycle: 5
+    num_models: 5
+    amber_relax: true
+
+# --- Stage 3: model selection ---------------------------------------------
+selection:
+  rank_by: ranking_score          # ranking_score | ptm | iptm
+  min_ranking_score: 0.0
+  reject_if_has_clash: true
+
+# --- Paths ----------------------------------------------------------------
+paths:
+  raw_predictions: data/predictions_raw
+  extracted:       data/predictions_extracted
+  best_models:     data/best_models
+  pdb_multichain:  data/trimers
+  pdb_singlechain: data/trimers_docking
+  reports:         reports

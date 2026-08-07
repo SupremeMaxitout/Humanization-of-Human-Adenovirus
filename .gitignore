@@ -1,0 +1,13 @@
+data/*
+!data/README.md
+reports/*
+!reports/.gitkeep
+config/templates/*.txt
+!config/templates/README.md
+__pycache__/
+*.pyc
+.DS_Store
+*.xtc
+*.trr
+*.cpt
+*.edr
