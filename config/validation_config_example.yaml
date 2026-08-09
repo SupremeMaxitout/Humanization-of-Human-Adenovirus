@@ -1,0 +1,21 @@
+target:
+  virus: HAdV-C5
+  protomer_length: 952
+region:
+  name: HVR7
+  range: [418, 458]
+regions:
+  HVR1: [136, 169]
+  HVR2: [188, 194]
+  HVR3: [212, 218]
+  HVR4: [248, 261]
+  HVR5: [268, 283]
+  HVR6: [305, 314]
+  HVR7: [418, 458]
+paths:
+  models: data/models
+  predictions: data/predictions
+validation:
+  reference: wild_type
+  thresholds:
+    min_mean_plddt: 70.0
