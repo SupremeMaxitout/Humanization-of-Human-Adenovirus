@@ -1,5 +1,12 @@
 # Humanisation of Human Adenovirus
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21910027.svg)](https://doi.org/10.5281/zenodo.21910027)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
+[![GROMACS 2023.2](https://img.shields.io/badge/GROMACS-2023.2-orange.svg)](https://www.gromacs.org/)
+[![HADDOCK 2.5](https://img.shields.io/badge/HADDOCK-2.5-green.svg)](https://www.bonvinlab.org/)
+
+
 **A reproducible computational pipeline for immune-evasive capsid engineering.**
 
 Grafts human-derived sequence into the hypervariable regions (HVRs) of the
