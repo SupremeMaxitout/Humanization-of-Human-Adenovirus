@@ -1,0 +1,62 @@
+#!/bin/bash
+#PBS -N prod_SYSNAME
+#PBS -q normal
+#PBS -l select=1:ncpus=16:ngpus=1
+#PBS -l walltime=24:00:00
+#PBS -j oe
+#PBS -o BASEDIR/SYSNAME/prod_pbs.log
+#
+# =====================================================================
+# Production MD: 100 ns for SYSNAME
+#
+# LOG PATH: prod_pbs.log, NOT prod.log. PBS and GROMACS must not share a
+# log filename — see job_setup.pbs.template.
+#
+# 24 h is the ASPIRE2A maximum; 26 h is REJECTED. You do not need it:
+# -maxh 23.0 stops gracefully and checkpoints, -cpi resumes, and -noappend
+# writes prod.partNNNN.* rather than risking an append checksum failure.
+# Expect 2-3 submissions to reach 100 ns. That is by design.
+#
+# COMPLETION is marked by prod*.gro existing AND the last step equalling
+# nsteps. "Finished mdrun" alone is NOT sufficient — it also prints after a
+# -maxh stop.
+# =====================================================================
+
+module load gromacs/2023.2-gpu
+
+WORK="BASEDIR/SYSNAME"
+cd "$WORK" || exit 1
+
+if ! ls npt.gro npt.part*.gro >/dev/null 2>&1; then
+    echo "[ERROR] no npt .gro — setup is not finished. Run job_setup.pbs first."
+    exit 1
+fi
+
+# Build the production TPR once. NEVER re-run grompp between restarts:
+# a new tpr breaks checkpoint continuity.
+if [ ! -s prod.tpr ]; then
+    echo "[INFO] first submission — generating production TPR"
+    NPTGRO=$(ls npt.gro npt.part*.gro 2>/dev/null | tail -1)
+    gmx grompp -f prod.mdp -c "$NPTGRO" -t npt.cpt -p topol.top \
+        -o prod.tpr -maxwarn 2 2>&1 | tee grompp_prod.log
+    [ -s prod.tpr ] || { echo "[ERROR] grompp failed — see grompp_prod.log"; exit 2; }
+fi
+
+echo "[INFO] starting/resuming production at $(date)"
+gmx mdrun -deffnm prod \
+    -cpi prod.cpt \
+    -noappend \
+    -nb gpu -pme gpu -bonded gpu \
+    -ntmpi 1 -ntomp 16 \
+    -maxh 23.0 \
+    2>&1 | tee -a mdrun_prod.log
+
+# Completion test: final .gro present AND last step == nsteps.
+NSTEPS=$(grep -E "^[[:space:]]*nsteps" prod.mdp | head -1 | grep -oE "[0-9]+")
+LAST=$(grep -hE "^ +Step +Time" -A1 prod*.log 2>/dev/null | tail -1 | awk '{print $1}')
+if ls prod*.gro >/dev/null 2>&1 && [ "${LAST:-0}" = "${NSTEPS:-x}" ]; then
+    echo "[SUCCESS] 100 ns complete for SYSNAME at $(date)"
+else
+    NS=$(echo "${LAST:-0}" | awk '{printf "%.1f", $1*0.002/1000}')
+    echo "[PARTIAL] SYSNAME reached ~${NS} ns. Resubmit this same script."
+fi

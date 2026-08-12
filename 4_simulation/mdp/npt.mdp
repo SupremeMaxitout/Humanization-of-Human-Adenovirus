@@ -1,0 +1,44 @@
+; npt.mdp — Stage 4: main NPT equilibration, 1 ns, position-restrained
+;
+; CRITICAL: refcoord-scaling = com — see npt_warmup.mdp. THIS file is where its
+; absence killed every early run of this project at ~1400 steps.
+
+integrator      = md
+dt              = 0.001
+nsteps          = 1000000      ; 1 ns at 1 fs
+
+nstlog          = 5000
+nstenergy       = 5000
+nstxout-compressed = 5000
+
+continuation    = yes
+constraints     = h-bonds
+constraint-algorithm = lincs
+lincs-order     = 4
+lincs-iter      = 1
+
+cutoff-scheme   = Verlet
+nstlist         = 20
+coulombtype     = PME
+pme-order       = 4
+fourierspacing  = 0.12
+rcoulomb        = 1.2
+rvdw            = 1.2
+rlist           = 1.2
+pbc             = xyz
+DispCorr        = EnerPres
+
+tcoupl          = V-rescale
+tc-grps         = Protein Non-Protein
+tau-t           = 0.1 0.1
+ref-t           = 310 310
+
+pcoupl          = C-rescale
+pcoupltype      = isotropic
+tau-p           = 5.0
+ref-p           = 1.0
+compressibility = 4.5e-5
+refcoord-scaling = com         ; <<< MANDATORY with -DPOSRES + pcoupl
+
+gen-vel         = no
+define          = -DPOSRES

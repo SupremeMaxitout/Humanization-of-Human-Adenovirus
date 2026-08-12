@@ -1,0 +1,49 @@
+; npt_warmup.mdp — Stage 3: gentle NPT warm-up, 50 ps at 0.5 fs
+;
+; The first stage where the barostat acts. Predicted structures carry mild
+; polar contacts (1.8-2.3 A instead of 2.7-3.0). At 2 fs those can convert into
+; a LINCS blow-up; at 0.5 fs with a soft barostat they simply relax apart.
+;
+; CRITICAL: refcoord-scaling = com
+; With -DPOSRES and ANY pressure coupling, omitting this makes GROMACS default
+; to "No": atom coordinates scale with the box while restraint reference points
+; stay frozen. Tension accumulates and the run detonates a few ps in. This one
+; missing line cost ~2 weeks and ~15,000 CPU-hours. See docs/LESSONS.md #1.
+
+integrator      = md
+dt              = 0.0005       ; 0.5 fs, deliberately small
+nsteps          = 100000       ; 50 ps
+
+nstlog          = 5000
+nstenergy       = 5000
+nstxout-compressed = 5000
+
+continuation    = yes
+constraints     = h-bonds
+constraint-algorithm = lincs
+lincs-order     = 6            ; raised from 4: tolerates larger rotations
+lincs-iter      = 2            ; while strained contacts relax
+
+cutoff-scheme   = Verlet
+nstlist         = 20
+coulombtype     = PME
+rcoulomb        = 1.2
+rvdw            = 1.2
+rlist           = 1.2
+pbc             = xyz
+DispCorr        = EnerPres
+
+tcoupl          = V-rescale
+tc-grps         = Protein Non-Protein
+tau-t           = 0.1 0.1
+ref-t           = 310 310
+
+pcoupl          = C-rescale    ; modern, stable, tolerates a non-equilibrated box
+pcoupltype      = isotropic
+tau-p           = 5.0
+ref-p           = 1.0
+compressibility = 4.5e-5
+refcoord-scaling = com         ; <<< MANDATORY with -DPOSRES + pcoupl
+
+gen-vel         = no
+define          = -DPOSRES

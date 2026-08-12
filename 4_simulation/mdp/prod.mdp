@@ -1,0 +1,46 @@
+; prod.mdp — Stage 5: production MD, 100 ns, UNRESTRAINED
+;
+; No -DPOSRES, so refcoord-scaling does not apply (nothing is restrained).
+; This is the only stage whose trajectory you analyse.
+;
+; For replicates: change gen-vel to yes and set a different gen-seed per
+; replicate (REPLICATES in generate_all_jobs.sh does this for you).
+
+integrator      = md
+dt              = 0.002        ; 2 fs, safe with h-bond constraints
+nsteps          = 50000000     ; 100 ns
+
+nstlog          = 25000
+nstenergy       = 25000
+nstxout-compressed = 25000     ; 50 ps/frame -> 2000 frames over 100 ns
+
+continuation    = yes
+constraints     = h-bonds
+constraint-algorithm = lincs
+lincs-order     = 4
+lincs-iter      = 1
+
+cutoff-scheme   = Verlet
+nstlist         = 40
+coulombtype     = PME
+pme-order       = 4
+fourierspacing  = 0.12
+rcoulomb        = 1.2
+rvdw            = 1.2
+rlist           = 1.2
+pbc             = xyz
+DispCorr        = EnerPres
+
+tcoupl          = V-rescale
+tc-grps         = Protein Non-Protein
+tau-t           = 0.1 0.1
+ref-t           = 310 310
+
+pcoupl          = C-rescale
+pcoupltype      = isotropic
+tau-p           = 5.0
+ref-p           = 1.0
+compressibility = 4.5e-5
+
+gen-vel         = no
+; no "define" line: production is unrestrained

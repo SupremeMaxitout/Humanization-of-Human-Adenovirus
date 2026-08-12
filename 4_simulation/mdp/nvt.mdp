@@ -1,0 +1,41 @@
+; nvt.mdp — Stage 2: NVT equilibration, 100 ps, position-restrained
+; Constant volume, so no barostat and refcoord-scaling does not apply here.
+
+integrator      = md
+dt              = 0.002
+nsteps          = 50000        ; 100 ps
+tinit           = 0
+
+nstlog          = 5000
+nstenergy       = 5000
+nstxout-compressed = 5000
+
+continuation    = no
+constraints     = h-bonds
+constraint-algorithm = lincs
+lincs-order     = 4
+lincs-iter      = 1
+
+cutoff-scheme   = Verlet
+nstlist         = 20
+coulombtype     = PME
+pme-order       = 4
+fourierspacing  = 0.12
+rcoulomb        = 1.2
+rvdw            = 1.2
+rlist           = 1.2
+pbc             = xyz
+DispCorr        = EnerPres
+
+tcoupl          = V-rescale
+tc-grps         = Protein Non-Protein
+tau-t           = 0.1 0.1
+ref-t           = 310 310
+
+pcoupl          = no
+
+gen-vel         = yes
+gen-temp        = 310
+gen-seed        = -1
+
+define          = -DPOSRES

@@ -1,0 +1,22 @@
+; em.mdp — Stage 1: steepest-descent energy minimisation
+;
+; Steepest descent ONLY. Do NOT add a conjugate-gradient stage: TIP3P water is
+; held rigid by SETTLE regardless of "constraints = none", and cg cannot recover
+; when a water constraint fails during its line search. It dies with
+;   "Minimizer 'cg' can not handle constraint failures"
+; See docs/LESSONS.md #2.
+
+integrator      = steep
+emtol           = 100.0        ; kJ/mol/nm (GROMACS default 1000; stricter here)
+emstep          = 0.01
+nsteps          = 50000
+
+nstlist         = 10
+cutoff-scheme   = Verlet
+coulombtype     = PME
+rcoulomb        = 1.2
+rvdw            = 1.2
+rlist           = 1.2
+pbc             = xyz
+
+constraints     = none         ; let bond lengths relax freely during EM

@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -N setup_SYSNAME
+#PBS -q normal
+#PBS -l select=1:ncpus=16:ngpus=1
+#PBS -l walltime=24:00:00
+#PBS -j oe
+#PBS -o BASEDIR/SYSNAME/setup_pbs.log
+#
+# =====================================================================
+# Setup: EM + NVT + NPT warm-up + NPT for SYSNAME
+#
+# QUEUE: submit to "normal", NOT "g1". PBS routes GPU requests into g1
+# automatically; "qsub -q g1" is rejected with "Access to queue is denied".
+#
+# LOG PATH: writes to setup_pbs.log, NOT setup.log. If PBS and GROMACS share
+# a log filename, PBS overwrites it, GROMACS cannot checksum it on resume, and
+# the restart dies with "Cannot do appending because of this condition".
+#
+# WALLTIME: 24 h (the ASPIRE2A maximum) with GPU offload. The first version
+# used 10 h on CPU and NPT was killed at step 480,000 of 500,000.
+#
+# RESUMABLE: setup_md.sh skips completed stages and every mdrun uses -cpi.
+# If this job is killed for any reason, just qsub it again.
+# =====================================================================
+
+module load gromacs/2023.2-gpu
+
+export FORCE_FIELD="${FORCE_FIELD:-FFNAME}"
+export USE_GPU="${USE_GPU:-1}"
+
+cd "BASEDIR/SYSNAME" || exit 1
+bash "PIPELINEDIR/setup_md.sh" INPUT_PDB SYSNAME
+rc=$?
+
+if ls BASEDIR/SYSNAME/npt.gro BASEDIR/SYSNAME/npt.part*.gro >/dev/null 2>&1; then
+    echo "[SUCCESS] SYSNAME setup complete at $(date)"
+else
+    echo "[INCOMPLETE] SYSNAME did not finish (exit $rc)."
+    echo "             Resubmit this same script to resume from checkpoint."
+fi
