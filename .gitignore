@@ -11,3 +11,44 @@ __pycache__/
 *.trr
 *.cpt
 *.edr
+# ---- append these to .gitignore ----
+
+# working data (never commit)
+data/*
+!data/README.md
+
+# generated reports — commit only what you intend to share
+reports/**/*.xlsx
+reports/**/*.csv
+reports/**/*.png
+reports/**/manifest_*.json
+!reports/README.md
+!reports/.gitkeep
+
+# MD output
+*.xtc
+*.trr
+*.edr
+*.cpt
+*.tpr
+*.gro
+*.log
+step*.pdb
+\#*\#
+
+# docking output
+work_pbs/
+results/
+*.pbs
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# editors / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: Humanisation of Human Adenovirus
+message: If you use this pipeline, please cite it as below.
+type: software
+authors:
+  - given-names: Mujtaba
+    family-names: Khan
+    affiliation: Nanyang Technological University
+repository-code: "https://github.com/SupremeMaxitout/Humanization-of-Human-Adenovirus"
+abstract: >-
+  A reproducible computational pipeline for immune-evasive adenovirus capsid
+  engineering: homology-guided humanisation of hexon hypervariable regions,
+  structure prediction, model validation, immune-component docking, and
+  molecular dynamics stability screening.
+keywords:
+  - structural biology
+  - molecular dynamics
+  - protein engineering
+  - gene therapy
+  - adenovirus
+  - AlphaFold
+  - GROMACS
+  - HADDOCK
+license: MIT
