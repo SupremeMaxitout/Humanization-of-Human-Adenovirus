@@ -1,10 +1,27 @@
-# Tool 1 — modelling
-biopython>=1.81
-pandas>=2.0
-openpyxl>=3.1
-gemmi>=0.6
-pyyaml>=6.0
+# Pinned for reproducibility. These are the versions the published results were
+# produced with. Loosen only deliberately — a silent dependency upgrade is a
+# common cause of "the code ran but the numbers changed".
+#
+#   pip install -r requirements.txt
+#
+# For a fully isolated environment use environment.yml with conda/mamba, which
+# also pins Python itself.
 
-# Tool 2 — validation (also uses biopython, numpy)
-numpy>=1.24
-matplotlib>=3.7
+# --- core scientific stack ---
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+matplotlib==3.8.4
+
+# --- structural biology ---
+biopython==1.83          # PDB/mmCIF parsing, SASA, neighbour search
+gemmi==0.6.5             # mmCIF -> PDB conversion (stage 1)
+
+# --- file formats ---
+openpyxl==3.1.2          # Excel reports
+PyYAML==6.0.1            # configuration
+
+# --- optional: local structure prediction ---
+# Install separately; large and platform-specific.
+#   pip install openmm==8.1.1 pdbfixer==1.9
+#   ColabFold: https://github.com/YoshitakaMo/localcolabfold

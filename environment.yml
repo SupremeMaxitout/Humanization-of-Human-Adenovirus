@@ -1,0 +1,34 @@
+# Fully isolated environment, including the Python version itself.
+#
+#   conda env create -f environment.yml      (or: mamba env create -f ...)
+#   conda activate hadv-humanisation
+#
+# External engines (GROMACS, HADDOCK, CNS, AlphaFold3) are NOT included —
+# see README "Requirements" for how to obtain each.
+
+name: hadv-humanisation
+
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - python=3.10.9          # matches the cluster module used for HADDOCK jobs
+
+  - numpy=1.26.4
+  - pandas=2.2.2
+  - scipy=1.13.1
+  - matplotlib=3.8.4
+
+  - biopython=1.83
+  - gemmi=0.6.5
+
+  - openpyxl=3.1.2
+  - pyyaml=6.0.1
+
+  - pip
+  - pip:
+      # optional, only needed for local structure preparation
+      - openmm==8.1.1
+      - pdbfixer==1.9
